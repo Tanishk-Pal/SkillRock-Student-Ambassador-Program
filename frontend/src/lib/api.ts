@@ -1,9 +1,16 @@
 import axios from 'axios'
 
+const baseURL = import.meta.env.VITE_API_URL || '/api'
+
 const api = axios.create({
-  baseURL: '/api',
+  baseURL,
   timeout: 30000,
 })
+
+export const getUploadUrl = (filename: string) => {
+  const backendBase = (import.meta.env.VITE_API_URL || '').replace(/\/api\/?$/, '')
+  return `${backendBase}/uploads/${filename}`
+}
 
 // Attach admin JWT token to every request
 api.interceptors.request.use((config) => {

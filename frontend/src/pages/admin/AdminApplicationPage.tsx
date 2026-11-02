@@ -6,7 +6,7 @@ import {
   ExternalLink, FileText,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
-import api from '../../lib/api'
+import api, { getUploadUrl } from '../../lib/api'
 import { STATUS_META, SCORE_CATEGORIES } from '../../lib/constants'
 
 type ApplicationDetail = {
@@ -324,14 +324,14 @@ export default function AdminApplicationPage() {
                     <div className="space-y-3">
                       <video
                         controls
-                        src={`/uploads/${application.videoFilePath}`}
+                        src={getUploadUrl(application.videoFilePath)}
                         className="w-full max-h-[380px] rounded-xl bg-slate-900 border border-slate-200 shadow-sm"
                         preload="metadata"
                       >
                         Your browser does not support HTML5 video streaming.
                       </video>
                       <a
-                        href={`/uploads/${application.videoFilePath}`}
+                        href={getUploadUrl(application.videoFilePath)}
                         download
                         className="btn-secondary text-xs py-2 px-3 inline-flex items-center gap-1.5"
                       >
