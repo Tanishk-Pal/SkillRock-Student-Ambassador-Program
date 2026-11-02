@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import express from 'express';
+import express, { Request, Response } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import path from 'path';
@@ -35,7 +35,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(generalLimiter);
 
 // Health check
-app.get('/health', (_req, res) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', service: 'SSAP Backend', time: new Date().toISOString() });
 });
 
@@ -47,7 +47,7 @@ app.use('/api/applications', applicationsRouter);
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // 404 handler
-app.use((_req, res) => {
+app.use((_req: Request, res: Response) => {
   res.status(404).json({ error: 'Not found' });
 });
 

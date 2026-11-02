@@ -20,7 +20,7 @@ export const connectDB = async (): Promise<void> => {
       minPoolSize: 5,
       serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000,
-    });
+    } as mongoose.ConnectOptions);
     isConnected = true;
     console.log(`✅ MongoDB connected successfully (Database: ${DB_NAME})`);
   } catch (error) {
