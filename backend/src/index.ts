@@ -83,8 +83,8 @@ app.use((_req: Request, res: Response) => {
 
 // Global error handler
 app.use((err: Error, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
-  console.error('Unhandled error:', err.message);
-  res.status(500).json({ error: 'An unexpected error occurred' });
+  console.error('Unhandled error:', err);
+  res.status(500).json({ error: 'An unexpected error occurred', message: err.message, stack: err.stack });
 });
 
 // Start server

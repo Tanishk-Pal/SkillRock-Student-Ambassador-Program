@@ -49,9 +49,9 @@ router.post(
         token,
         admin: { email: admin.email, name: admin.name, role: admin.role },
       });
-    } catch (err) {
+    } catch (err: any) {
       console.error('Login error:', err);
-      return res.status(500).json({ error: 'Internal server error' });
+      return res.status(500).json({ error: 'Internal server error', message: err?.message, stack: err?.stack });
     }
   }
 );
