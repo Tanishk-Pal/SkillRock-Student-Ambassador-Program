@@ -1,14 +1,18 @@
 import axios from 'axios'
 
-const baseURL = import.meta.env.VITE_API_URL || '/api'
+// Fallback to live Render backend if VITE_API_URL is unset
+const defaultApiUrl = 'https://skillrock-student-ambassador-program.onrender.com/api'
+const baseURL = import.meta.env.VITE_API_URL || defaultApiUrl
 
 const api = axios.create({
   baseURL,
-  timeout: 30000,
+  timeout: 45000, // 45s to safely handle Render free-tier cold starts
 })
 
 export const getUploadUrl = (filename: string) => {
-  const backendBase = (import.meta.env.VITE_API_URL || '').replace(/\/api\/?$/, '')
+  if (!filename) return ''
+  if (filename.startsWith('http://') || filename.startsWith('https://')) return filename
+  const backendBase = (import.meta.env.VITE_API_URL || defaultApiUrl).replace(/\/api\/?$/, '')
   return `${backendBase}/uploads/${filename}`
 }
 

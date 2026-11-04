@@ -62,6 +62,19 @@ type ApplicationDetail = {
   updatedAt: string
 }
 
+function getGoogleDriveEmbedUrl(url?: string): string | null {
+  if (!url) return null
+  const fileMatch = url.match(/\/file\/d\/([a-zA-Z0-9_-]+)/)
+  if (fileMatch && fileMatch[1]) {
+    return `https://drive.google.com/file/d/${fileMatch[1]}/preview`
+  }
+  const idMatch = url.match(/[?&]id=([a-zA-Z0-9_-]+)/)
+  if (idMatch && idMatch[1]) {
+    return `https://drive.google.com/file/d/${idMatch[1]}/preview`
+  }
+  return null
+}
+
 function Section({ title, icon: Icon, children }: { title: string; icon: any; children: React.ReactNode }) {
   return (
     <div className="card mb-6">
@@ -102,7 +115,12 @@ function ScenarioAnswer({ label, answer, reasoning }: { label: string; answer: s
 export default function AdminApplicationPage() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
-  const adminUser = JSON.parse(localStorage.getItem('ssap_admin_user') || '{}')
+  let adminUser: { email?: string; name?: string; role?: string } = {}
+  try {
+    adminUser = JSON.parse(localStorage.getItem('ssap_admin_user') || '{}')
+  } catch {
+    adminUser = {}
+  }
 
   const [application, setApplication] = useState<ApplicationDetail | null>(null)
   const [loading, setLoading] = useState(true)
@@ -296,12 +314,27 @@ export default function AdminApplicationPage() {
 
             {/* Section 6 */}
             <Section title="Video Introduction" icon={Video}>
-              {application.videoType === 'link' ? (
-                <div>
+              {/* If Google Drive link is provided */}
+              {application.videoUrl && (
+                <div className="mb-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Google Drive Video URL:</span>
-                    <span className="text-xs font-semibold text-violet-700 bg-violet-50 px-2 py-0.5 rounded">Google Drive</span>
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Google Drive Video:</span>
+                    <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
+                      Google Drive
+                    </span>
                   </div>
+
+                  {getGoogleDriveEmbedUrl(application.videoUrl) ? (
+                    <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-200 mb-3 shadow-inner">
+                      <iframe
+                        src={getGoogleDriveEmbedUrl(application.videoUrl)!}
+                        className="w-full h-full border-0"
+                        allow="autoplay; fullscreen"
+                        title="Applicant Video Introduction"
+                      />
+                    </div>
+                  ) : null}
+
                   <p className="text-xs text-slate-600 font-mono bg-slate-50 p-2.5 rounded-lg border border-slate-200 break-all mb-3">
                     {application.videoUrl}
                   </p>
@@ -309,27 +342,41 @@ export default function AdminApplicationPage() {
                     href={application.videoUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="btn-primary text-xs py-2 px-4 inline-flex items-center gap-1.5"
+                    className="btn-primary text-xs py-2 px-4 inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700"
                   >
-                    Open Google Drive Video <ExternalLink className="w-3.5 h-3.5" />
+                    Open in Google Drive <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Direct Video Upload (≤ 30 MB)</span>
-                    <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">30 MB Video</span>
+              )}
+
+              {/* If Direct File Upload is provided */}
+              {application.videoFilePath && (
+                <div className="space-y-3 pt-2 border-t border-slate-100">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Uploaded Video File</span>
+                    <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
+                      MP4 / WebM
+                    </span>
                   </div>
-                  {application.videoFilePath ? (
-                    <div className="space-y-3">
-                      <video
-                        controls
-                        src={getUploadUrl(application.videoFilePath)}
-                        className="w-full max-h-[380px] rounded-xl bg-slate-900 border border-slate-200 shadow-sm"
-                        preload="metadata"
+                  <div className="space-y-3">
+                    <video
+                      controls
+                      crossOrigin="anonymous"
+                      src={getUploadUrl(application.videoFilePath)}
+                      className="w-full max-h-[380px] rounded-xl bg-slate-900 border border-slate-200 shadow-sm"
+                      preload="metadata"
+                    >
+                      Your browser does not support HTML5 video playback.
+                    </video>
+                    <div className="flex flex-wrap gap-2">
+                      <a
+                        href={getUploadUrl(application.videoFilePath)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-primary text-xs py-2 px-3 inline-flex items-center gap-1.5"
                       >
-                        Your browser does not support HTML5 video streaming.
-                      </video>
+                        Open Video in New Tab <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
                       <a
                         href={getUploadUrl(application.videoFilePath)}
                         download
@@ -338,12 +385,17 @@ export default function AdminApplicationPage() {
                         Download Video File
                       </a>
                     </div>
-                  ) : (
-                    <div className="flex items-center gap-3 bg-slate-50 rounded-xl p-4">
-                      <FileText className="w-5 h-5 text-slate-500" />
-                      <p className="text-slate-700 text-sm">Video file recorded by applicant.</p>
+                    <div className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
+                      Direct storage link: <a href={getUploadUrl(application.videoFilePath)} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline break-all">{getUploadUrl(application.videoFilePath)}</a>
                     </div>
-                  )}
+                  </div>
+                </div>
+              )}
+
+              {!application.videoUrl && !application.videoFilePath && (
+                <div className="flex items-center gap-3 bg-slate-50 rounded-xl p-4 border border-slate-200">
+                  <FileText className="w-5 h-5 text-slate-400" />
+                  <p className="text-slate-600 text-sm">No video introduction link or file submitted for this application.</p>
                 </div>
               )}
             </Section>

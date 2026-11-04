@@ -5,14 +5,16 @@ export const generalLimiter = rateLimit({
   max: 600, // Allow high concurrent student traffic
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false, default: false },
   message: { error: 'Too many requests, please try again later.' },
 });
 
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 20,
+  max: 100, // Relaxed to prevent locking out valid admins on shared/campus IP
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false, default: false },
   message: { error: 'Too many login attempts, please try again later.' },
 });
 
@@ -21,6 +23,7 @@ export const submissionLimiter = rateLimit({
   max: 120, // High-throughput campus Wi-Fi & shared network support
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false, default: false },
   message: { error: 'High submission volume detected from this network. Please wait a few moments and try again.' },
 });
 
@@ -29,5 +32,6 @@ export const statusLimiter = rateLimit({
   max: 200,
   standardHeaders: true,
   legacyHeaders: false,
+  validate: { xForwardedForHeader: false, default: false },
   message: { error: 'Too many status check attempts.' },
 });

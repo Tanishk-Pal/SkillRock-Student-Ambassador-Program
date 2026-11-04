@@ -13,6 +13,9 @@ import leaderboardRouter from './routes/leaderboard';
 import certificatesRouter from './routes/certificates';
 
 const app = express();
+// Enable trust proxy for Render, Vercel, and Cloudflare reverse proxies
+app.set('trust proxy', 1);
+
 const PORT = process.env.PORT || 5000;
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 const allowedOrigins = FRONTEND_URL.split(',').map((u) => u.trim());
@@ -20,6 +23,7 @@ const allowedOrigins = FRONTEND_URL.split(',').map((u) => u.trim());
 // Security middleware
 app.use(
   helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
     crossOriginEmbedderPolicy: false,
     contentSecurityPolicy: false,
   })
@@ -60,8 +64,17 @@ app.use('/api/applications', applicationsRouter);
 app.use('/api/leaderboard', leaderboardRouter);
 app.use('/api/certificates', certificatesRouter);
 
-// Serve uploaded files (admin-only access enforced in frontend)
-app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
+// Serve uploaded files (with explicit CORS and byte range streaming for video playback)
+app.use(
+  '/uploads',
+  express.static(path.join(process.cwd(), 'uploads'), {
+    setHeaders: (res) => {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+      res.setHeader('Accept-Ranges', 'bytes');
+    },
+  })
+);
 
 // 404 handler
 app.use((_req: Request, res: Response) => {

@@ -39,7 +39,12 @@ function StatusBadge({ status }: { status: string }) {
 
 export default function AdminDashboardPage() {
   const navigate = useNavigate()
-  const adminUser = JSON.parse(localStorage.getItem('ssap_admin_user') || '{}')
+  let adminUser: { email?: string; name?: string; role?: string } = {}
+  try {
+    adminUser = JSON.parse(localStorage.getItem('ssap_admin_user') || '{}')
+  } catch {
+    adminUser = {}
+  }
 
   const [applications, setApplications] = useState<Application[]>([])
   const [stats, setStats] = useState<Stats | null>(null)
@@ -113,7 +118,7 @@ export default function AdminDashboardPage() {
   }
 
   const getStatusCount = (status: string) =>
-    stats?.byStatus.find(s => s._id === status)?.count ?? 0
+    stats?.byStatus?.find(s => s._id === status)?.count ?? 0
 
   const statCards = [
     { label: 'Total Applications', value: stats?.total ?? 0, icon: Users, color: 'text-brand-violet', bg: 'bg-violet-50' },
