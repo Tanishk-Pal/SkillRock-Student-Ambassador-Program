@@ -130,13 +130,13 @@ export default function HomePage() {
             {/* Program Highlights */}
             <div className="mt-12 flex flex-wrap items-center justify-center gap-6 text-xs font-semibold text-slate-500">
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" /> 100% Free Leadership Program
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" /> 4-Month Cohort (600 pts/Month • 2,400 pts Total)
               </span>
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" /> 4-Month Verified Digital Certificate
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Monthly Milestone Physical &amp; Digital Rewards
               </span>
               <span className="flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Tiered Milestone Recognition
+                <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Digital Certificate for Program Completion
               </span>
             </div>
           </div>
@@ -258,15 +258,18 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* ─── Section 3: Tiered Milestone Structure (from Screenshot 3) */}
+        {/* ─── Section 3: Tiered Milestone Structure ────────────────── */}
         <section id="rewards" className="py-20 bg-white">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
             {/* Deep Blue Container Card */}
             <div className="bg-gradient-to-br from-[#2563EB] to-[#1D4ED8] rounded-3xl p-8 sm:p-12 text-white shadow-xl relative overflow-hidden">
-              {/* Decorative Trophy & Confetti */}
+              {/* Header */}
               <div className="text-center mb-8">
                 <div className="w-16 h-16 rounded-full bg-white/10 backdrop-blur-xs flex items-center justify-center mx-auto mb-3 border border-white/20">
                   <Trophy className="w-8 h-8 text-amber-300" />
+                </div>
+                <div className="inline-block px-3.5 py-1 rounded-full bg-white/15 text-blue-100 text-xs font-bold uppercase tracking-wider mb-2">
+                  4 Months • 600 Points Each Month • Total 2,400 Points
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-white">
                   Ambassador Tiered Milestone Structure
@@ -281,28 +284,39 @@ export default function HomePage() {
                 <table className="w-full text-left text-slate-800">
                   <thead className="bg-slate-50 border-b border-slate-200 text-slate-400 text-xs font-bold uppercase tracking-wider">
                     <tr>
-                      <th className="py-3.5 px-4 sm:px-6">Tier Category</th>
+                      <th className="py-3.5 px-4 sm:px-6">Month &amp; Tier</th>
                       <th className="py-3.5 px-4 sm:px-6">Points</th>
+                      <th className="py-3.5 px-4 sm:px-6">Physical Rewards</th>
                       <th className="py-3.5 px-4 sm:px-6">Digital Recognition</th>
-                      <th className="py-3.5 px-4 sm:px-6 hidden sm:table-cell">Leadership Growth</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 text-xs sm:text-sm">
                     {BADGE_TIERS.map(tier => (
                       <tr key={tier.tier} className="hover:bg-slate-50/60 transition-colors">
                         <td className="py-4 px-4 sm:px-6 font-extrabold text-slate-900">
-                          {tier.tier}
+                          <div>
+                            <span className="text-[11px] font-bold text-slate-400 uppercase block tracking-wider">
+                              {tier.month}
+                            </span>
+                            <span className="text-slate-900 font-extrabold text-sm sm:text-base">
+                              {tier.tier}
+                            </span>
+                          </div>
                         </td>
                         <td className="py-4 px-4 sm:px-6">
                           <span className="font-black text-[#2563EB] bg-blue-50 px-2.5 py-1 rounded-full">
-                            {tier.minPoints}+ pts
+                            {tier.minPoints} pts
                           </span>
                         </td>
-                        <td className="py-4 px-4 sm:px-6 font-semibold text-slate-700">
-                          {tier.digitalReward}
+                        <td className="py-4 px-4 sm:px-6 font-bold text-slate-900">
+                          <span className="inline-flex items-center gap-1.5">
+                            🎁 {tier.physicalReward}
+                          </span>
                         </td>
-                        <td className="py-4 px-4 sm:px-6 text-slate-500 hidden sm:table-cell">
-                          {tier.perks}
+                        <td className="py-4 px-4 sm:px-6 font-medium text-slate-600">
+                          <span className="inline-flex items-center gap-1.5">
+                            ✨ {tier.digitalReward}
+                          </span>
                         </td>
                       </tr>
                     ))}
@@ -310,18 +324,25 @@ export default function HomePage() {
                 </table>
               </div>
 
+              {/* Points Gained Rule Callout */}
+              <div className="mt-4 text-center">
+                <p className="text-xs text-blue-100 font-semibold bg-white/10 rounded-full py-1.5 px-4 inline-block">
+                  ⚡ Awards and physical rewards are dispatched exclusively upon successfully gaining the required monthly points.
+                </p>
+              </div>
+
               {/* 4-Month Certificate Callout */}
-              <div className="mt-8 bg-white/10 backdrop-blur-xs rounded-2xl p-6 border border-white/20 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="mt-6 bg-white/10 backdrop-blur-xs rounded-2xl p-6 border border-white/20 flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3 text-left">
                   <div className="w-12 h-12 rounded-xl bg-emerald-400/20 text-emerald-300 flex items-center justify-center shrink-0">
                     <Award className="w-6 h-6" />
                   </div>
                   <div>
                     <h4 className="font-extrabold text-white text-base">
-                      Verified 4-Month Program Completion Certificate
+                      Digital Certificate for Program Completion
                     </h4>
                     <p className="text-xs text-blue-100 mt-0.5">
-                      Awarded to ambassadors completing their semester chapter sprint with active workshops and peer mentoring.
+                      Awarded in Month 4 upon completing the full 2,400-point cohort term with active campus leadership.
                     </p>
                   </div>
                 </div>
@@ -530,16 +551,16 @@ export default function HomePage() {
                   a: 'Yes, 100% free. There is no application fee, registration cost, or hidden charge. We believe student leadership and peer learning should be universally accessible.'
                 },
                 {
-                  q: 'What rewards do ambassadors receive upon completion?',
-                  a: 'Ambassadors who fulfill their 4-month milestones receive an authenticated, cryptographically verifiable Digital Completion Certificate, tiered digital honors badges (The Explorer, The Trailblazer, The Changemaker, SkillRock Champ), priority recognition on the campus leaderboard, and recommendations for their portfolio.'
+                  q: 'What rewards do ambassadors receive during and upon completing the program?',
+                  a: 'Ambassadors earn milestone rewards for each month they achieve the 600-point target (Total 2,400 points across 4 months). Rewards include a Premium SkillRock Diary (Month 1), SkillRock Branded Bottle (Month 2), Premium Face Wash Kit (Month 3), and an authenticated 4-Month Digital Completion Certificate & Elite Champ recognition (Month 4). Awards are granted strictly upon gaining the required milestone points.'
                 },
                 {
                   q: 'How much time commitment is expected per week?',
                   a: 'Around 2 to 4 hours per week. Activities are flexible and designed around your collegiate exam schedules and coursework.'
                 },
                 {
-                  q: 'How does the scoring and leaderboard competition work?',
-                  a: 'Points are uncapped and awarded based on verified campus activities: hosting a study jam, onboarding peers to learning modules, and submitting community feedback. Scores update in real time on the public leaderboard.'
+                  q: 'How does the scoring and monthly points structure work?',
+                  a: 'Each month has a 600-point target earned through campus activities (hosting study jams, onboarding peers to learning modules, and organizing workshops). Reaching 600 points each month unlocks that month\'s physical reward, totaling 2,400 points for full program completion.'
                 },
                 {
                   q: 'How does the video introduction work in the application?',
