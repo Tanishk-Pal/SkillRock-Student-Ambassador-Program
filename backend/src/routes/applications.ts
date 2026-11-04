@@ -32,6 +32,24 @@ const upload = multer({
   },
 });
 
+// Middleware to catch Multer upload errors gracefully without 500 crash
+const handleVideoUpload = (req: Request, res: Response, next: any) => {
+  upload.single('videoFile')(req, res, (err: any) => {
+    if (err) {
+      if (err instanceof multer.MulterError) {
+        if (err.code === 'LIMIT_FILE_SIZE') {
+          return res.status(400).json({
+            errors: [{ msg: 'Video file exceeds 30 MB. Please compress the video or provide a Google Drive link.' }],
+          });
+        }
+        return res.status(400).json({ errors: [{ msg: `Upload error: ${err.message}` }] });
+      }
+      return res.status(400).json({ errors: [{ msg: err.message || 'Video upload failed' }] });
+    }
+    next();
+  });
+};
+
 // Generate application ID
 const generateAppId = (): string => {
   const year = new Date().getFullYear();
@@ -43,7 +61,7 @@ const generateAppId = (): string => {
 router.post(
   '/',
   submissionLimiter,
-  upload.single('videoFile'),
+  handleVideoUpload,
   [
     body('fullName').trim().notEmpty().withMessage('Full name is required'),
     body('email').isEmail().normalizeEmail().withMessage('Valid email required'),
@@ -93,22 +111,12 @@ router.post(
 
     try {
       const { email } = req.body;
-      const existing = await Application.findOne({ email: email.toLowerCase() });
-      if (existing) {
-        if (req.file) fs.unlinkSync(req.file.path);
-        return res.status(409).json({
-          error: 'An application with this email already exists.',
-          applicationId: existing.applicationId,
-          statusToken: existing.statusToken,
-        });
-      }
+      const cleanEmail = String(email || '').trim().toLowerCase();
 
       // Build application data
       const appData: Partial<any> = {
-        applicationId: generateAppId(),
-        statusToken: uuidv4(),
         fullName: req.body.fullName,
-        email: email.toLowerCase(),
+        email: cleanEmail,
         phone: req.body.phone,
         college: req.body.college,
         university: req.body.university,
@@ -142,11 +150,36 @@ router.post(
         quickFire1: req.body.quickFire1,
         quickFire2: req.body.quickFire2,
         declarationAccepted: req.body.declarationAccepted === 'true',
-        videoType: req.file ? 'upload' : 'link',
+        videoType: req.file ? 'upload' : (req.body.videoType || 'link'),
         videoFilePath: req.file ? req.file.filename : undefined,
         videoUrl: req.body.videoUrl || undefined,
         status: 'submitted',
       };
+
+      const existing = await Application.findOne({ email: cleanEmail });
+      if (existing) {
+        if (existing.status === 'submitted') {
+          // If previous submission is still pending review, seamlessly update it
+          Object.assign(existing, appData);
+          existing.statusToken = existing.statusToken || uuidv4();
+          await existing.save();
+          return res.status(200).json({
+            success: true,
+            applicationId: existing.applicationId,
+            statusToken: existing.statusToken,
+            message: 'Application updated successfully!',
+          });
+        }
+        if (req.file) fs.unlinkSync(req.file.path);
+        return res.status(409).json({
+          error: 'An application with this email has already been submitted and is currently in review.',
+          applicationId: existing.applicationId,
+          statusToken: existing.statusToken,
+        });
+      }
+
+      appData.applicationId = generateAppId();
+      appData.statusToken = uuidv4();
 
       const application = new Application(appData);
       await application.save();

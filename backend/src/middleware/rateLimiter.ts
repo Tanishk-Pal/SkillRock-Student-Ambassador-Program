@@ -20,7 +20,7 @@ export const authLimiter = rateLimit({
 
 export const submissionLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 120, // High-throughput campus Wi-Fi & shared network support
+  max: 500, // High limit to allow stress-free student submissions & campus Wi-Fi
   standardHeaders: false,
   legacyHeaders: false,
   validate: false,

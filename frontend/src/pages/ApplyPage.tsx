@@ -90,6 +90,7 @@ const defaultValues: ApplicationFormData = {
 export default function ApplyPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [uploadPercent, setUploadPercent] = useState<number | null>(null)
   const [direction, setDirection] = useState<'forward' | 'back'>('forward')
   const navigate = useNavigate()
   const topRef = useRef<HTMLDivElement>(null)
@@ -217,13 +218,21 @@ export default function ApplyPage() {
         formData.append('videoFile', data.videoFile)
       }
 
+      setUploadPercent(0)
+
       const response = await api.post('/applications', formData, {
-        headers: { 'Content-Type': 'multipart/form-data' },
-        timeout: 120000,
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total)
+            setUploadPercent(percent)
+          }
+        },
+        timeout: 180000,
       })
 
       // Clear draft on success
       localStorage.removeItem(DRAFT_KEY)
+      toast.success(response.data.message || 'Application submitted successfully!')
 
       navigate('/application-success', {
         state: {
@@ -234,18 +243,24 @@ export default function ApplyPage() {
         },
       })
     } catch (err: any) {
+      console.error('Submission error:', err)
       if (err.response?.status === 409) {
-        toast.error('An application with this email already exists.')
+        toast.error(err.response.data.error || 'An application with this email already exists.')
         toast('You can check your application status on the status page.', { icon: 'ℹ️' })
         navigate('/application-status')
       } else if (err.response?.data?.errors) {
         const msgs = err.response.data.errors.map((e: any) => e.msg).join(', ')
-        toast.error(`Validation failed: ${msgs}`)
+        toast.error(`Validation error: ${msgs}`)
+      } else if (err.response?.data?.error) {
+        toast.error(err.response.data.error)
+      } else if (err.code === 'ECONNABORTED' || err.message?.includes('timeout')) {
+        toast.error('Submission timed out. Tip: For large videos, use a Google Drive link for instant submission.')
       } else {
         toast.error('Submission failed. Please check your connection and try again.')
       }
     } finally {
       setIsSubmitting(false)
+      setUploadPercent(null)
     }
   }
 
@@ -311,7 +326,16 @@ export default function ApplyPage() {
                 {currentStep === 4 && <Step4Campus />}
                 {currentStep === 5 && <Step5QuickFire />}
                 {currentStep === 6 && <Step6Video />}
-                {currentStep === 7 && <Step7Review onSubmit={methods.handleSubmit(onSubmit)} isSubmitting={isSubmitting} />}
+                {currentStep === 7 && (
+                  <Step7Review
+                    onSubmit={methods.handleSubmit(onSubmit, (errs) => {
+                      const first = Object.values(errs)[0]?.message || 'Please complete all required fields.'
+                      toast.error(String(first))
+                    })}
+                    isSubmitting={isSubmitting}
+                    uploadPercent={uploadPercent}
+                  />
+                )}
               </div>
 
               {/* Navigation */}

@@ -16,9 +16,10 @@ const DECLARATION_ITEMS = [
 type Step7ReviewProps = {
   onSubmit: () => void
   isSubmitting: boolean
+  uploadPercent?: number | null
 }
 
-export default function Step7Review({ onSubmit, isSubmitting }: Step7ReviewProps) {
+export default function Step7Review({ onSubmit, isSubmitting, uploadPercent }: Step7ReviewProps) {
   const { watch, register, formState: { errors } } = useFormContext<ApplicationFormData>()
   const data = watch()
 
@@ -186,12 +187,14 @@ export default function Step7Review({ onSubmit, isSubmitting }: Step7ReviewProps
         type="button"
         onClick={onSubmit}
         disabled={isSubmitting}
-        className="btn-primary w-full py-4 text-base justify-center"
+        className="btn-primary w-full py-4 text-base justify-center shadow-lg hover:shadow-xl transition-all"
       >
         {isSubmitting ? (
           <>
             <Loader2 className="w-5 h-5 animate-spin" />
-            Submitting Application...
+            {uploadPercent !== null && uploadPercent !== undefined && uploadPercent < 100
+              ? `Uploading Video (${uploadPercent}%)...`
+              : 'Submitting Application...'}
           </>
         ) : (
           <>
@@ -200,6 +203,12 @@ export default function Step7Review({ onSubmit, isSubmitting }: Step7ReviewProps
           </>
         )}
       </button>
+
+      {isSubmitting && (
+        <p className="text-center text-xs text-slate-500 animate-pulse">
+          Please keep this tab open while your application is securely transmitted...
+        </p>
+      )}
     </div>
   )
 }
