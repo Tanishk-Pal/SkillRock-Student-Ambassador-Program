@@ -5,9 +5,12 @@ import cors from 'cors';
 import path from 'path';
 import { connectDB } from './config/database';
 import { ensureAdminUser } from './config/seed';
+import { ensureLeaderboardSeed } from './config/seedLeaderboard';
 import { generalLimiter } from './middleware/rateLimiter';
 import adminRouter from './routes/admin';
 import applicationsRouter from './routes/applications';
+import leaderboardRouter from './routes/leaderboard';
+import certificatesRouter from './routes/certificates';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -54,6 +57,8 @@ app.get('/health', (_req: Request, res: Response) => {
 // API routes
 app.use('/api/admin', adminRouter);
 app.use('/api/applications', applicationsRouter);
+app.use('/api/leaderboard', leaderboardRouter);
+app.use('/api/certificates', certificatesRouter);
 
 // Serve uploaded files (admin-only access enforced in frontend)
 app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
@@ -73,6 +78,7 @@ app.use((err: Error, _req: express.Request, res: express.Response, _next: expres
 (async () => {
   await connectDB();
   await ensureAdminUser();
+  await ensureLeaderboardSeed();
   app.listen(PORT, () => {
     console.log(`🚀 SSAP Backend running on port ${PORT}`);
     console.log(`   Health check: http://localhost:${PORT}/health`);

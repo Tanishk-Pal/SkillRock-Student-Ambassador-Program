@@ -3,6 +3,8 @@ import HomePage from './pages/HomePage'
 import ApplyPage from './pages/ApplyPage'
 import ApplicationSuccessPage from './pages/ApplicationSuccessPage'
 import ApplicationStatusPage from './pages/ApplicationStatusPage'
+import LeaderboardPage from './pages/LeaderboardPage'
+import VerifyCertificatePage from './pages/VerifyCertificatePage'
 import PrivacyPage from './pages/PrivacyPage'
 import TermsPage from './pages/TermsPage'
 import AdminLoginPage from './pages/admin/AdminLoginPage'
@@ -18,6 +20,9 @@ export default function App() {
       <Route path="/apply" element={<ApplyPage />} />
       <Route path="/application-success" element={<ApplicationSuccessPage />} />
       <Route path="/application-status" element={<ApplicationStatusPage />} />
+      <Route path="/leaderboard" element={<LeaderboardPage />} />
+      <Route path="/verify-certificate" element={<VerifyCertificatePage />} />
+      <Route path="/verify-certificate/:certId" element={<VerifyCertificatePage />} />
       <Route path="/privacy" element={<PrivacyPage />} />
       <Route path="/terms" element={<TermsPage />} />
 

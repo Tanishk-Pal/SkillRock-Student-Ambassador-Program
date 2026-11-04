@@ -39,19 +39,25 @@ export default function Footer() {
 
           {/* Program */}
           <div>
-            <h4 className="font-semibold text-white mb-4 text-xs uppercase tracking-wider text-slate-300">Program</h4>
+            <h4 className="font-semibold text-white mb-4 text-xs uppercase tracking-wider text-slate-300">Community</h4>
             <ul className="space-y-2.5">
               {[
-                { href: '/#overview', label: 'About SSAP' },
-                { href: '/#responsibilities', label: 'Responsibilities' },
-                { href: '/#benefits', label: 'Ambassador Benefits' },
-                { href: '/#timeline', label: 'Sprint Timeline' },
-                { href: '/#faq', label: 'FAQ' },
+                { to: '/leaderboard', label: '🏆 Campus Leaderboard', isRoute: true },
+                { to: '/verify-certificate', label: '🛡️ Verify Certificate', isRoute: true },
+                { href: '/#who-we-look-for', label: 'Who We Look For' },
+                { href: '/#rewards', label: 'Tiers & Digital Badges' },
+                { href: '/#faq', label: 'Program FAQ' },
               ].map(item => (
-                <li key={item.href}>
-                  <a href={item.href} className="text-slate-400 hover:text-white transition-colors text-xs font-medium">
-                    {item.label}
-                  </a>
+                <li key={item.label}>
+                  {item.isRoute ? (
+                    <Link to={item.to} className="text-slate-400 hover:text-white transition-colors text-xs font-medium">
+                      {item.label}
+                    </Link>
+                  ) : (
+                    <a href={item.href} className="text-slate-400 hover:text-white transition-colors text-xs font-medium">
+                      {item.label}
+                    </a>
+                  )}
                 </li>
               ))}
             </ul>

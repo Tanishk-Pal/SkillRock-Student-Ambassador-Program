@@ -37,4 +37,25 @@ api.interceptors.response.use(
   }
 )
 
+export const fetchLeaderboard = async (params: { page?: number; limit?: number; search?: string; college?: string; badge?: string } = {}) => {
+  const query = new URLSearchParams()
+  if (params.page) query.append('page', params.page.toString())
+  if (params.limit) query.append('limit', params.limit.toString())
+  if (params.search) query.append('search', params.search)
+  if (params.college) query.append('college', params.college)
+  if (params.badge) query.append('badge', params.badge)
+  const res = await api.get(`/leaderboard?${query.toString()}`)
+  return res.data
+}
+
+export const fetchLeaderboardStats = async () => {
+  const res = await api.get('/leaderboard/stats')
+  return res.data
+}
+
+export const fetchCertificateDetails = async (certId: string) => {
+  const res = await api.get(`/certificates/verify/${encodeURIComponent(certId)}`)
+  return res.data
+}
+
 export default api
