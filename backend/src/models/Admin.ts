@@ -5,7 +5,7 @@ export interface IAdmin extends Document {
   email: string;
   passwordHash: string;
   name: string;
-  role: 'super_admin' | 'reviewer';
+  role: 'super_admin' | 'reviewer' | 'admin';
   lastLogin?: Date;
   comparePassword(password: string): Promise<boolean>;
 }
@@ -15,7 +15,7 @@ const AdminSchema = new Schema<IAdmin>(
     email: { type: String, required: true, unique: true, lowercase: true, trim: true },
     passwordHash: { type: String, required: true },
     name: { type: String, required: true, trim: true },
-    role: { type: String, enum: ['super_admin', 'reviewer'], default: 'reviewer' },
+    role: { type: String, enum: ['super_admin', 'reviewer', 'admin'], default: 'super_admin' },
     lastLogin: { type: Date },
   },
   { timestamps: true }

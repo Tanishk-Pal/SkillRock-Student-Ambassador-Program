@@ -34,20 +34,26 @@ router.post(
         return res.status(401).json({ error: 'Invalid credentials' });
       }
 
+      const assignedRole = admin.role === 'admin' ? 'super_admin' : (admin.role || 'super_admin');
+      admin.role = assignedRole;
+      admin.lastLogin = new Date();
+
+      await Admin.updateOne(
+        { _id: admin._id },
+        { $set: { lastLogin: new Date(), role: assignedRole } }
+      ).catch((e) => console.warn('Could not update lastLogin on admin:', e));
+
       const secret = process.env.JWT_SECRET || 'skillrock_ssap_default_jwt_secret_2026_super_secure';
 
       const token = jwt.sign(
-        { adminId: admin._id.toString(), email: admin.email, role: admin.role },
+        { adminId: admin._id.toString(), email: admin.email, role: assignedRole },
         secret,
         { expiresIn: '8h' }
       );
 
-      admin.lastLogin = new Date();
-      await admin.save();
-
       return res.json({
         token,
-        admin: { email: admin.email, name: admin.name, role: admin.role },
+        admin: { email: admin.email, name: admin.name, role: assignedRole },
       });
     } catch (err: any) {
       console.error('Login error:', err);
