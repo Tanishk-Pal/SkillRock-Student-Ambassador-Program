@@ -272,45 +272,57 @@ export default function AdminApplicationPage() {
               </div>
             </div>
 
-            {/* Section 2 */}
-            <Section title="Motivation & Commitment" icon={MessageSquare}>
-              <Field label="Why do you want to be an ambassador?" value={application.whyAmbassador} />
-              <Field label="What SkillRock can offer students" value={application.skillrockValue} />
-              <div className="grid grid-cols-2 gap-4">
-                <Field label="Time contribution" value={application.timeContribution} />
-                <Field label="Weekly availability" value={application.weeklyAvailability} />
-                <Field label="Prior experience" value={application.priorExperience} />
-              </div>
-              {application.priorExperienceDescription && (
-                <Field label="Experience description" value={application.priorExperienceDescription} />
+            {/* Section 2: Leadership & Campus Vision */}
+            <Section title="Leadership & Campus Vision" icon={MessageSquare}>
+              <Field label="Why do you want to become a SkillRock Ambassador?" value={application.whyAmbassador} />
+              <Field label="Planned Workshop / Study Jam / Campus Initiative" value={application.personalGoal} />
+
+              {/* Optional / Legacy Motivation Fields */}
+              {(application.skillrockValue || application.priorExperience || application.timeContribution) && (
+                <div className="mt-4 pt-4 border-t border-slate-100">
+                  {application.skillrockValue && <Field label="What SkillRock can offer students" value={application.skillrockValue} />}
+                  <div className="grid grid-cols-2 gap-4">
+                    {application.timeContribution && <Field label="Time contribution" value={application.timeContribution} />}
+                    {application.weeklyAvailability && <Field label="Weekly availability" value={application.weeklyAvailability} />}
+                    {application.priorExperience && <Field label="Prior experience" value={application.priorExperience} />}
+                  </div>
+                  {application.priorExperienceDescription && (
+                    <Field label="Experience description" value={application.priorExperienceDescription} />
+                  )}
+                </div>
               )}
-              <Field label="Personal goal" value={application.personalGoal} />
             </Section>
 
-            {/* Section 3 */}
-            <Section title="Situational Judgment" icon={Brain}>
-              <ScenarioAnswer label="Scenario 1 — Low Registration" answer={application.scenario1Answer} reasoning={application.scenario1Reasoning} />
-              <ScenarioAnswer label="Scenario 2 — Campus Restrictions" answer={application.scenario2Answer} />
-              <ScenarioAnswer label="Scenario 3 — Low Event Attendance" answer={application.scenario3Answer} />
-              <ScenarioAnswer label="Scenario 4 — Students Don't Understand" answer={application.scenario4Answer} />
-              <ScenarioAnswer label="Scenario 5 — Collaboration Without Budget" answer={application.scenario5Answer} />
-              <ScenarioAnswer label="Scenario 6 — Public Criticism" answer={application.scenario6Answer} />
-            </Section>
+            {/* Legacy Section 3: Situational Judgment */}
+            {(application.scenario1Answer || application.scenario2Answer) && (
+              <Section title="Situational Judgment (Legacy)" icon={Brain}>
+                {application.scenario1Answer && <ScenarioAnswer label="Scenario 1 — Low Registration" answer={application.scenario1Answer} reasoning={application.scenario1Reasoning} />}
+                {application.scenario2Answer && <ScenarioAnswer label="Scenario 2 — Campus Restrictions" answer={application.scenario2Answer} />}
+                {application.scenario3Answer && <ScenarioAnswer label="Scenario 3 — Low Event Attendance" answer={application.scenario3Answer} />}
+                {application.scenario4Answer && <ScenarioAnswer label="Scenario 4 — Students Don't Understand" answer={application.scenario4Answer} />}
+                {application.scenario5Answer && <ScenarioAnswer label="Scenario 5 — Collaboration Without Budget" answer={application.scenario5Answer} />}
+                {application.scenario6Answer && <ScenarioAnswer label="Scenario 6 — Public Criticism" answer={application.scenario6Answer} />}
+              </Section>
+            )}
 
-            {/* Section 4 */}
-            <Section title="Campus Knowledge" icon={MapPin}>
-              <Field label="Waiting spot" value={application.campusWaitingPlace} />
-              <Field label="Gathering area" value={application.campusGatheringArea} />
-              <Field label="Reaching 500 students in 24hrs" value={application.campusReach500} />
-              <Field label="Campus event opportunity" value={application.campusEvent} />
-              <Field label="Campus tradition / inside joke" value={application.campusTradition} />
-            </Section>
+            {/* Legacy Section 4: Campus Knowledge */}
+            {(application.campusWaitingPlace || application.campusGatheringArea || application.campusReach500 || application.campusEvent || application.campusTradition) && (
+              <Section title="Campus Knowledge (Legacy)" icon={MapPin}>
+                {application.campusWaitingPlace && <Field label="Waiting spot" value={application.campusWaitingPlace} />}
+                {application.campusGatheringArea && <Field label="Gathering area" value={application.campusGatheringArea} />}
+                {application.campusReach500 && <Field label="Reaching 500 students in 24hrs" value={application.campusReach500} />}
+                {application.campusEvent && <Field label="Campus event opportunity" value={application.campusEvent} />}
+                {application.campusTradition && <Field label="Campus tradition / inside joke" value={application.campusTradition} />}
+              </Section>
+            )}
 
-            {/* Section 5 */}
-            <Section title="Quick-Fire" icon={ZapIcon}>
-              <ScenarioAnswer label="Integrity question" answer={application.quickFire1} />
-              <ScenarioAnswer label="Deadline question" answer={application.quickFire2} />
-            </Section>
+            {/* Legacy Section 5: Quick-Fire */}
+            {(application.quickFire1 || application.quickFire2) && (
+              <Section title="Quick-Fire (Legacy)" icon={ZapIcon}>
+                {application.quickFire1 && <ScenarioAnswer label="Integrity question" answer={application.quickFire1} />}
+                {application.quickFire2 && <ScenarioAnswer label="Deadline question" answer={application.quickFire2} />}
+              </Section>
+            )}
 
             {/* Section 6 */}
             <Section title="Video Introduction" icon={Video}>

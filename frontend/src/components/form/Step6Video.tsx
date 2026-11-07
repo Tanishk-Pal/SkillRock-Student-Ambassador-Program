@@ -145,7 +145,8 @@ export default function Step6Video() {
               <input
                 {...register('videoUrl', {
                   validate: (val) => {
-                    if (videoType === 'link' && !val) return 'Google Drive video link is required'
+                    if (videoType !== 'link') return true
+                    if (!val || !val.trim()) return 'Google Drive video link is required'
                     if (/youtube\.com|youtu\.be/i.test(val)) {
                       return 'YouTube links are not accepted. Please provide a Google Drive link or upload a video file directly.'
                     }

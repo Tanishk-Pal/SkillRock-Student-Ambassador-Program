@@ -7,21 +7,15 @@ import Navbar from '../components/layout/Navbar'
 import Footer from '../components/layout/Footer'
 import Step1Personal from '../components/form/Step1Personal'
 import Step2Motivation from '../components/form/Step2Motivation'
-import Step3Situational from '../components/form/Step3Situational'
-import Step4Campus from '../components/form/Step4Campus'
-import Step5QuickFire from '../components/form/Step5QuickFire'
 import Step6Video from '../components/form/Step6Video'
 import Step7Review from '../components/form/Step7Review'
 import api from '../lib/api'
 
 const STEPS = [
-  { id: 1, title: 'Personal Info', short: 'Personal' },
-  { id: 2, title: 'Motivation', short: 'Motivation' },
-  { id: 3, title: 'Situations', short: 'Situations' },
-  { id: 4, title: 'Your Campus', short: 'Campus' },
-  { id: 5, title: 'Quick-Fire', short: 'Quick-Fire' },
-  { id: 6, title: 'Video Intro', short: 'Video' },
-  { id: 7, title: 'Review', short: 'Review' },
+  { id: 1, title: 'Personal & College', short: 'Personal' },
+  { id: 2, title: 'Leadership & Vision', short: 'Vision' },
+  { id: 3, title: 'Video Intro', short: 'Video' },
+  { id: 4, title: 'Review & Submit', short: 'Review' },
 ]
 
 const DRAFT_KEY = 'ssap_draft_application'
@@ -31,43 +25,43 @@ export type ApplicationFormData = {
   email: string
   phone: string
   college: string
-  university: string
+  university?: string
   degree: string
   year: string
   branch: string
   city: string
   state: string
-  linkedinUrl: string
-  instagramUrl: string
-  preferredLanguage: string
-  weeklyAvailability: string
+  linkedinUrl?: string
+  instagramUrl?: string
+  preferredLanguage?: string
+  weeklyAvailability?: string
 
   whyAmbassador: string
-  skillrockValue: string
-  timeContribution: string
-  priorExperience: string
-  priorExperienceDescription: string
   personalGoal: string
+  skillrockValue?: string
+  timeContribution?: string
+  priorExperience?: string
+  priorExperienceDescription?: string
 
-  scenario1Answer: string
-  scenario1Reasoning: string
-  scenario2Answer: string
-  scenario3Answer: string
-  scenario4Answer: string
-  scenario5Answer: string
-  scenario6Answer: string
+  scenario1Answer?: string
+  scenario1Reasoning?: string
+  scenario2Answer?: string
+  scenario3Answer?: string
+  scenario4Answer?: string
+  scenario5Answer?: string
+  scenario6Answer?: string
 
-  campusWaitingPlace: string
-  campusGatheringArea: string
-  campusReach500: string
-  campusEvent: string
-  campusTradition: string
+  campusWaitingPlace?: string
+  campusGatheringArea?: string
+  campusReach500?: string
+  campusEvent?: string
+  campusTradition?: string
 
-  quickFire1: string
-  quickFire2: string
+  quickFire1?: string
+  quickFire2?: string
 
   videoType: 'upload' | 'link'
-  videoUrl: string
+  videoUrl?: string
   videoFile?: File | null
 
   declarationAccepted: boolean
@@ -76,13 +70,8 @@ export type ApplicationFormData = {
 const defaultValues: ApplicationFormData = {
   fullName: '', email: '', phone: '', college: '', university: '',
   degree: '', year: '', branch: '', city: '', state: '',
-  linkedinUrl: '', instagramUrl: '', preferredLanguage: 'English', weeklyAvailability: '',
-  whyAmbassador: '', skillrockValue: '', timeContribution: '', priorExperience: '',
-  priorExperienceDescription: '', personalGoal: '',
-  scenario1Answer: '', scenario1Reasoning: '', scenario2Answer: '', scenario3Answer: '',
-  scenario4Answer: '', scenario5Answer: '', scenario6Answer: '',
-  campusWaitingPlace: '', campusGatheringArea: '', campusReach500: '', campusEvent: '', campusTradition: '',
-  quickFire1: '', quickFire2: '',
+  linkedinUrl: '', instagramUrl: '', preferredLanguage: 'English', weeklyAvailability: '3–5 hours',
+  whyAmbassador: '', personalGoal: '',
   videoType: 'link', videoUrl: '', videoFile: null,
   declarationAccepted: false,
 }
@@ -132,16 +121,10 @@ export default function ApplyPage() {
     let fieldsToValidate: (keyof ApplicationFormData)[] = []
 
     if (currentStep === 1) {
-      fieldsToValidate = ['fullName', 'email', 'phone', 'college', 'university', 'degree', 'year', 'branch', 'city', 'state', 'preferredLanguage', 'weeklyAvailability']
+      fieldsToValidate = ['fullName', 'email', 'phone', 'college', 'degree', 'year', 'branch', 'city', 'state']
     } else if (currentStep === 2) {
-      fieldsToValidate = ['whyAmbassador', 'skillrockValue', 'timeContribution', 'priorExperience', 'personalGoal']
+      fieldsToValidate = ['whyAmbassador', 'personalGoal']
     } else if (currentStep === 3) {
-      fieldsToValidate = ['scenario1Answer', 'scenario2Answer', 'scenario3Answer', 'scenario4Answer', 'scenario5Answer', 'scenario6Answer']
-    } else if (currentStep === 4) {
-      fieldsToValidate = ['campusWaitingPlace', 'campusGatheringArea', 'campusReach500', 'campusEvent', 'campusTradition']
-    } else if (currentStep === 5) {
-      fieldsToValidate = ['quickFire1', 'quickFire2']
-    } else if (currentStep === 6) {
       const vType = methods.getValues('videoType')
       if (vType === 'link') {
         const url = methods.getValues('videoUrl') || ''
@@ -198,16 +181,12 @@ export default function ApplyPage() {
       const textFields: (keyof ApplicationFormData)[] = [
         'fullName', 'email', 'phone', 'college', 'university', 'degree', 'year', 'branch',
         'city', 'state', 'linkedinUrl', 'instagramUrl', 'preferredLanguage', 'weeklyAvailability',
-        'whyAmbassador', 'skillrockValue', 'timeContribution', 'priorExperience',
-        'priorExperienceDescription', 'personalGoal', 'scenario1Answer', 'scenario1Reasoning',
-        'scenario2Answer', 'scenario3Answer', 'scenario4Answer', 'scenario5Answer', 'scenario6Answer',
-        'campusWaitingPlace', 'campusGatheringArea', 'campusReach500', 'campusEvent', 'campusTradition',
-        'quickFire1', 'quickFire2', 'videoType', 'videoUrl',
+        'whyAmbassador', 'personalGoal', 'videoType', 'videoUrl',
       ]
 
       textFields.forEach(field => {
         const val = data[field]
-        if (val !== undefined && val !== null) {
+        if (val !== undefined && val !== null && val !== '') {
           formData.append(field, String(val))
         }
       })
@@ -322,11 +301,8 @@ export default function ApplyPage() {
               <div className="animate-slide-up">
                 {currentStep === 1 && <Step1Personal />}
                 {currentStep === 2 && <Step2Motivation />}
-                {currentStep === 3 && <Step3Situational />}
-                {currentStep === 4 && <Step4Campus />}
-                {currentStep === 5 && <Step5QuickFire />}
-                {currentStep === 6 && <Step6Video />}
-                {currentStep === 7 && (
+                {currentStep === 3 && <Step6Video />}
+                {currentStep === 4 && (
                   <Step7Review
                     onSubmit={methods.handleSubmit(onSubmit, (errs) => {
                       const first = Object.values(errs)[0]?.message || 'Please complete all required fields.'
@@ -339,7 +315,7 @@ export default function ApplyPage() {
               </div>
 
               {/* Navigation */}
-              {currentStep < 7 && (
+              {currentStep < 4 && (
                 <div className="mt-8 flex items-center justify-between">
                   <button
                     type="button"

@@ -4,12 +4,12 @@ export interface IApplication extends Document {
   applicationId: string;
   statusToken: string;
   
-  // Personal Information
+  // Essential Personal & Academic Information
   fullName: string;
   email: string;
   phone: string;
   college: string;
-  university: string;
+  university?: string;
   degree: string;
   year: string;
   branch: string;
@@ -17,38 +17,36 @@ export interface IApplication extends Document {
   state: string;
   linkedinUrl?: string;
   instagramUrl?: string;
-  preferredLanguage: string;
-  weeklyAvailability: string;
+  preferredLanguage?: string;
+  weeklyAvailability?: string;
 
-  // Section 2: Motivation
+  // Essential Leadership & Vision
   whyAmbassador: string;
-  skillrockValue: string;
-  timeContribution: string;
-  priorExperience: string;
+  personalGoal: string; // Campus event / study circle vision
+  skillrockValue?: string;
+  timeContribution?: string;
+  priorExperience?: string;
   priorExperienceDescription?: string;
-  personalGoal: string;
 
-  // Section 3: Situational Judgment
-  scenario1Answer: string;
+  // Legacy fields (optional for backward compatibility)
+  scenario1Answer?: string;
   scenario1Reasoning?: string;
-  scenario2Answer: string;
-  scenario3Answer: string;
-  scenario4Answer: string;
-  scenario5Answer: string;
-  scenario6Answer: string;
+  scenario2Answer?: string;
+  scenario3Answer?: string;
+  scenario4Answer?: string;
+  scenario5Answer?: string;
+  scenario6Answer?: string;
 
-  // Section 4: Campus Knowledge
-  campusWaitingPlace: string;
-  campusGatheringArea: string;
-  campusReach500: string;
-  campusEvent: string;
-  campusTradition: string;
+  campusWaitingPlace?: string;
+  campusGatheringArea?: string;
+  campusReach500?: string;
+  campusEvent?: string;
+  campusTradition?: string;
 
-  // Section 5: Quick-Fire
-  quickFire1: string;
-  quickFire2: string;
+  quickFire1?: string;
+  quickFire2?: string;
 
-  // Section 6: Video
+  // Video Introduction
   videoType: 'upload' | 'link';
   videoUrl?: string;
   videoFilePath?: string;
@@ -56,7 +54,7 @@ export interface IApplication extends Document {
   // Declaration
   declarationAccepted: boolean;
 
-  // Admin fields
+  // Admin Review fields
   status: 'submitted' | 'under_review' | 'shortlisted' | 'interview' | 'selected' | 'not_selected';
   totalScore?: number;
   motivationScore?: number;
@@ -88,7 +86,7 @@ const ApplicationSchema = new Schema<IApplication>(
     },
     phone: { type: String, required: true, trim: true, maxlength: 20 },
     college: { type: String, required: true, trim: true, maxlength: 300 },
-    university: { type: String, required: true, trim: true, maxlength: 300 },
+    university: { type: String, trim: true, maxlength: 300 },
     degree: { type: String, required: true, trim: true, maxlength: 200 },
     year: { type: String, required: true },
     branch: { type: String, required: true, trim: true, maxlength: 200 },
@@ -96,32 +94,33 @@ const ApplicationSchema = new Schema<IApplication>(
     state: { type: String, required: true, trim: true, maxlength: 100 },
     linkedinUrl: { type: String, trim: true, maxlength: 500 },
     instagramUrl: { type: String, trim: true, maxlength: 500 },
-    preferredLanguage: { type: String, required: true },
-    weeklyAvailability: { type: String, required: true },
+    preferredLanguage: { type: String, default: 'English' },
+    weeklyAvailability: { type: String, default: '3–5 hours' },
 
     whyAmbassador: { type: String, required: true, maxlength: 3000 },
-    skillrockValue: { type: String, required: true, maxlength: 3000 },
-    timeContribution: { type: String, required: true },
-    priorExperience: { type: String, required: true },
+    personalGoal: { type: String, required: true, maxlength: 3000 },
+    skillrockValue: { type: String, maxlength: 3000 },
+    timeContribution: { type: String },
+    priorExperience: { type: String },
     priorExperienceDescription: { type: String, maxlength: 2000 },
-    personalGoal: { type: String, required: true, maxlength: 2000 },
 
-    scenario1Answer: { type: String, required: true },
+    // Legacy fields
+    scenario1Answer: { type: String },
     scenario1Reasoning: { type: String, maxlength: 1000 },
-    scenario2Answer: { type: String, required: true },
-    scenario3Answer: { type: String, required: true },
-    scenario4Answer: { type: String, required: true },
-    scenario5Answer: { type: String, required: true },
-    scenario6Answer: { type: String, required: true },
+    scenario2Answer: { type: String },
+    scenario3Answer: { type: String },
+    scenario4Answer: { type: String },
+    scenario5Answer: { type: String },
+    scenario6Answer: { type: String },
 
-    campusWaitingPlace: { type: String, required: true, maxlength: 2000 },
-    campusGatheringArea: { type: String, required: true, maxlength: 2000 },
-    campusReach500: { type: String, required: true, maxlength: 2000 },
-    campusEvent: { type: String, required: true, maxlength: 2000 },
-    campusTradition: { type: String, required: true, maxlength: 1000 },
+    campusWaitingPlace: { type: String, maxlength: 2000 },
+    campusGatheringArea: { type: String, maxlength: 2000 },
+    campusReach500: { type: String, maxlength: 2000 },
+    campusEvent: { type: String, maxlength: 2000 },
+    campusTradition: { type: String, maxlength: 1000 },
 
-    quickFire1: { type: String, required: true },
-    quickFire2: { type: String, required: true },
+    quickFire1: { type: String },
+    quickFire2: { type: String },
 
     videoType: { type: String, enum: ['upload', 'link'], required: true },
     videoUrl: { type: String, maxlength: 1000 },

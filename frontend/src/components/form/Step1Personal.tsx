@@ -1,7 +1,7 @@
 import { useFormContext } from 'react-hook-form'
 import { ApplicationFormData } from '../../pages/ApplyPage'
-import { INDIAN_STATES, STUDY_YEARS, LANGUAGES, AVAILABILITY_OPTIONS } from '../../lib/constants'
-import { User, Mail, Phone, GraduationCap, MapPin, Link2 } from 'lucide-react'
+import { INDIAN_STATES, STUDY_YEARS } from '../../lib/constants'
+import { User, Link2 } from 'lucide-react'
 
 export default function Step1Personal() {
   const { register, formState: { errors } } = useFormContext<ApplicationFormData>()
@@ -10,12 +10,12 @@ export default function Step1Personal() {
     <div className="card p-8">
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
-            <User className="w-5 h-5 text-brand-violet" />
+          <div className="w-10 h-10 bg-blue-100 text-blue-700 rounded-xl flex items-center justify-center">
+            <User className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-slate-900">Personal Information</h2>
-            <p className="text-slate-500 text-sm">Tell us about yourself</p>
+            <h2 className="text-xl font-bold text-slate-900">Personal & Academic Details</h2>
+            <p className="text-slate-500 text-sm">Basic details so our team and peer ambassadors can connect with you</p>
           </div>
         </div>
       </div>
@@ -39,19 +39,19 @@ export default function Step1Personal() {
             <input
               {...register('email', {
                 required: 'Email is required',
-                pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Enter a valid email' },
+                pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Enter a valid email address' },
               })}
               type="email"
               className={`input-field ${errors.email ? 'input-error' : ''}`}
-              placeholder="you@college.edu"
+              placeholder="you@college.edu or gmail.com"
             />
             {errors.email && <p className="error-msg"><span>⚠</span>{errors.email.message}</p>}
           </div>
           <div>
-            <label className="label">Phone Number <span className="text-red-500">*</span></label>
+            <label className="label">WhatsApp / Phone Number <span className="text-red-500">*</span></label>
             <input
               {...register('phone', {
-                required: 'Phone is required',
+                required: 'Phone number is required',
                 pattern: { value: /^[6-9]\d{9}$/, message: 'Enter a valid 10-digit Indian mobile number' },
               })}
               type="tel"
@@ -63,26 +63,15 @@ export default function Step1Personal() {
           </div>
         </div>
 
-        {/* College + University */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <div>
-            <label className="label">College Name <span className="text-red-500">*</span></label>
-            <input
-              {...register('college', { required: 'College name is required' })}
-              className={`input-field ${errors.college ? 'input-error' : ''}`}
-              placeholder="e.g. St. Xavier's College"
-            />
-            {errors.college && <p className="error-msg"><span>⚠</span>{errors.college.message}</p>}
-          </div>
-          <div>
-            <label className="label">University / Affiliation <span className="text-red-500">*</span></label>
-            <input
-              {...register('university', { required: 'University is required' })}
-              className={`input-field ${errors.university ? 'input-error' : ''}`}
-              placeholder="e.g. University of Mumbai"
-            />
-            {errors.university && <p className="error-msg"><span>⚠</span>{errors.university.message}</p>}
-          </div>
+        {/* College Name */}
+        <div>
+          <label className="label">College / Institute Name <span className="text-red-500">*</span></label>
+          <input
+            {...register('college', { required: 'College name is required' })}
+            className={`input-field ${errors.college ? 'input-error' : ''}`}
+            placeholder="e.g. Bansal College of Engineering, IIT Bombay, etc."
+          />
+          {errors.college && <p className="error-msg"><span>⚠</span>{errors.college.message}</p>}
         </div>
 
         {/* Degree + Branch */}
@@ -92,16 +81,16 @@ export default function Step1Personal() {
             <input
               {...register('degree', { required: 'Degree is required' })}
               className={`input-field ${errors.degree ? 'input-error' : ''}`}
-              placeholder="e.g. B.Tech, BCA, MBA"
+              placeholder="e.g. B.Tech, BCA, MCA, BSc"
             />
             {errors.degree && <p className="error-msg"><span>⚠</span>{errors.degree.message}</p>}
           </div>
           <div>
-            <label className="label">Branch / Department <span className="text-red-500">*</span></label>
+            <label className="label">Branch / Specialization <span className="text-red-500">*</span></label>
             <input
               {...register('branch', { required: 'Branch is required' })}
               className={`input-field ${errors.branch ? 'input-error' : ''}`}
-              placeholder="e.g. Computer Science, Marketing"
+              placeholder="e.g. Computer Science, AI/ML, IT"
             />
             {errors.branch && <p className="error-msg"><span>⚠</span>{errors.branch.message}</p>}
           </div>
@@ -110,8 +99,8 @@ export default function Step1Personal() {
         {/* Year of Study */}
         <div>
           <label className="label">Current Year of Study <span className="text-red-500">*</span></label>
-          <select {...register('year', { required: 'Year is required' })} className={`input-field ${errors.year ? 'input-error' : ''}`}>
-            <option value="">Select year</option>
+          <select {...register('year', { required: 'Year of study is required' })} className={`input-field ${errors.year ? 'input-error' : ''}`}>
+            <option value="">Select your academic year</option>
             {STUDY_YEARS.map(y => <option key={y} value={y}>{y}</option>)}
           </select>
           {errors.year && <p className="error-msg"><span>⚠</span>{errors.year.message}</p>}
@@ -124,7 +113,7 @@ export default function Step1Personal() {
             <input
               {...register('city', { required: 'City is required' })}
               className={`input-field ${errors.city ? 'input-error' : ''}`}
-              placeholder="e.g. Mumbai"
+              placeholder="e.g. Bhopal, Indore, Pune"
             />
             {errors.city && <p className="error-msg"><span>⚠</span>{errors.city.message}</p>}
           </div>
@@ -140,50 +129,32 @@ export default function Step1Personal() {
 
         {/* Social links (optional) */}
         <div className="p-5 bg-slate-50 rounded-xl border border-slate-200">
-          <h3 className="font-semibold text-slate-700 mb-4 flex items-center gap-2">
-            <Link2 className="w-4 h-4" /> Social Profiles <span className="text-slate-400 font-normal text-sm">(Optional)</span>
+          <h3 className="font-semibold text-slate-700 mb-3 flex items-center gap-2 text-sm">
+            <Link2 className="w-4 h-4 text-blue-600" /> Professional Profiles <span className="text-slate-400 font-normal text-xs">(Optional)</span>
           </h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className="label text-slate-600">LinkedIn URL</label>
+              <label className="label text-slate-600 text-xs">LinkedIn Profile URL</label>
               <input
                 {...register('linkedinUrl', {
                   pattern: { value: /^https?:\/\/(www\.)?linkedin\.com\/.+/, message: 'Enter a valid LinkedIn URL' },
                 })}
-                className={`input-field ${errors.linkedinUrl ? 'input-error' : ''}`}
-                placeholder="https://linkedin.com/in/yourname"
+                className={`input-field text-sm ${errors.linkedinUrl ? 'input-error' : ''}`}
+                placeholder="https://linkedin.com/in/username"
               />
               {errors.linkedinUrl && <p className="error-msg"><span>⚠</span>{errors.linkedinUrl.message}</p>}
             </div>
             <div>
-              <label className="label text-slate-600">Instagram URL</label>
+              <label className="label text-slate-600 text-xs">Instagram Profile URL</label>
               <input
                 {...register('instagramUrl', {
                   pattern: { value: /^https?:\/\/(www\.)?instagram\.com\/.+/, message: 'Enter a valid Instagram URL' },
                 })}
-                className={`input-field ${errors.instagramUrl ? 'input-error' : ''}`}
-                placeholder="https://instagram.com/yourhandle"
+                className={`input-field text-sm ${errors.instagramUrl ? 'input-error' : ''}`}
+                placeholder="https://instagram.com/handle"
               />
               {errors.instagramUrl && <p className="error-msg"><span>⚠</span>{errors.instagramUrl.message}</p>}
             </div>
-          </div>
-        </div>
-
-        {/* Language + Availability */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-          <div>
-            <label className="label">Preferred Communication Language <span className="text-red-500">*</span></label>
-            <select {...register('preferredLanguage', { required: 'Language is required' })} className="input-field">
-              {LANGUAGES.map(l => <option key={l} value={l}>{l}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="label">Weekly Availability <span className="text-red-500">*</span></label>
-            <select {...register('weeklyAvailability', { required: 'Availability is required' })} className={`input-field ${errors.weeklyAvailability ? 'input-error' : ''}`}>
-              <option value="">Select hours</option>
-              {AVAILABILITY_OPTIONS.map(o => <option key={o} value={o}>{o}</option>)}
-            </select>
-            {errors.weeklyAvailability && <p className="error-msg"><span>⚠</span>{errors.weeklyAvailability.message}</p>}
           </div>
         </div>
       </div>

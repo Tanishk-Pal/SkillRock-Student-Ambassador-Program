@@ -1,149 +1,89 @@
 import { useFormContext } from 'react-hook-form'
 import { ApplicationFormData } from '../../pages/ApplyPage'
-import { Heart } from 'lucide-react'
-import { AVAILABILITY_OPTIONS } from '../../lib/constants'
+import { Sparkles } from 'lucide-react'
 
 export default function Step2Motivation() {
   const { register, watch, formState: { errors } } = useFormContext<ApplicationFormData>()
-  const priorExp = watch('priorExperience')
+  const whyText = watch('whyAmbassador') || ''
+  const goalText = watch('personalGoal') || ''
 
   return (
     <div className="card p-8">
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 bg-violet-100 rounded-xl flex items-center justify-center">
-            <Heart className="w-5 h-5 text-brand-violet" />
+          <div className="w-10 h-10 bg-blue-100 text-blue-700 rounded-xl flex items-center justify-center">
+            <Sparkles className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-slate-900">Motivation & Commitment</h2>
-            <p className="text-slate-500 text-sm">Tell us about your passion and what drives you</p>
+            <h2 className="text-xl font-bold text-slate-900">Leadership & Campus Vision</h2>
+            <p className="text-slate-500 text-sm">Two core questions on how you want to build and lead your campus peer community</p>
           </div>
         </div>
       </div>
 
       <div className="space-y-8">
-        {/* Q1 */}
+        {/* Question 1: Leadership Motivation */}
         <div>
-          <label className="label text-base">
+          <label className="label text-base font-bold text-slate-900">
             1. Why do you want to become a SkillRock Student Ambassador?{' '}
             <span className="text-red-500">*</span>
           </label>
-          <p className="text-slate-500 text-sm mb-2">Share your genuine motivation. Be specific.</p>
+          <p className="text-slate-500 text-sm mb-3">
+            What motivates you to lead, help fellow students learn practical skills, and bring a curious peer group together on your campus?
+          </p>
           <textarea
             {...register('whyAmbassador', {
-              required: 'This answer is required',
-              minLength: { value: 100, message: 'Please write at least 100 characters' },
-              maxLength: { value: 3000, message: 'Maximum 3,000 characters' },
+              required: 'Please share your motivation for becoming an ambassador',
+              minLength: { value: 30, message: 'Please write at least 30 characters' },
+              maxLength: { value: 2000, message: 'Maximum 2,000 characters' },
             })}
             className={`textarea-field ${errors.whyAmbassador ? 'input-error' : ''}`}
-            placeholder="Explain what drew you to this program and why you believe you would be a good fit..."
-            rows={5}
-          />
-          <div className="flex justify-between mt-1">
-            {errors.whyAmbassador
-              ? <p className="error-msg"><span>⚠</span>{errors.whyAmbassador.message}</p>
-              : <span />}
-            <span className="text-xs text-slate-400">{(watch('whyAmbassador') || '').length}/3000</span>
-          </div>
-        </div>
-
-        {/* Q2 */}
-        <div>
-          <label className="label text-base">
-            2. What do you think SkillRock can offer students that they may not currently be getting from their usual learning methods?{' '}
-            <span className="text-red-500">*</span>
-          </label>
-          <textarea
-            {...register('skillrockValue', {
-              required: 'This answer is required',
-              minLength: { value: 80, message: 'Please write at least 80 characters' },
-              maxLength: { value: 3000, message: 'Maximum 3,000 characters' },
-            })}
-            className={`textarea-field ${errors.skillrockValue ? 'input-error' : ''}`}
-            placeholder="Think about the unique value proposition of skill-based learning and peer-to-peer skill exchange..."
+            placeholder="Share what excites you about this role, your passion for technology/skills, and why you want to represent SkillRock..."
             rows={4}
           />
-          {errors.skillrockValue && <p className="error-msg mt-1"><span>⚠</span>{errors.skillrockValue.message}</p>}
-        </div>
-
-        {/* Q3 */}
-        <div>
-          <label className="label text-base">
-            3. How much time can you realistically contribute each week?{' '}
-            <span className="text-red-500">*</span>
-          </label>
-          <p className="text-slate-500 text-sm mb-3">Be honest. This answer does not automatically affect selection.</p>
-          <div className="space-y-2">
-            {AVAILABILITY_OPTIONS.map(option => (
-              <label key={option} className="radio-option">
-                <input
-                  {...register('timeContribution', { required: 'Please select an option' })}
-                  type="radio"
-                  value={option}
-                  className="mt-0.5 accent-brand-violet"
-                />
-                <span className="text-slate-700 font-medium">{option}</span>
-              </label>
-            ))}
+          <div className="flex justify-between mt-1.5 text-xs">
+            {errors.whyAmbassador ? (
+              <p className="error-msg"><span>⚠</span>{errors.whyAmbassador.message}</p>
+            ) : (
+              <span className="text-slate-400">Keep it clear, authentic, and concise</span>
+            )}
+            <span className={whyText.length < 30 ? 'text-amber-600 font-medium' : 'text-slate-400'}>
+              {whyText.length}/2000
+            </span>
           </div>
-          {errors.timeContribution && <p className="error-msg mt-2"><span>⚠</span>{errors.timeContribution.message}</p>}
         </div>
 
-        {/* Q4 */}
+        {/* Question 2: Practical Workshop / Initiative Plan */}
         <div>
-          <label className="label text-base">
-            4. Have you previously organised an event, managed a community, created content, or led a team?{' '}
+          <label className="label text-base font-bold text-slate-900">
+            2. What technical workshop, study jam, or peer activity would you organize on campus?{' '}
             <span className="text-red-500">*</span>
           </label>
-          <div className="space-y-2 mb-4">
-            {['Yes', 'No', 'I have participated but not led'].map(option => (
-              <label key={option} className="radio-option">
-                <input
-                  {...register('priorExperience', { required: 'Please select an option' })}
-                  type="radio"
-                  value={option}
-                  className="mt-0.5 accent-brand-violet"
-                />
-                <span className="text-slate-700 font-medium">{option}</span>
-              </label>
-            ))}
-          </div>
-          {errors.priorExperience && <p className="error-msg"><span>⚠</span>{errors.priorExperience.message}</p>}
-
-          {priorExp && priorExp !== 'No' && (
-            <div className="mt-4">
-              <label className="label">If yes or partially, briefly describe your experience</label>
-              <textarea
-                {...register('priorExperienceDescription', { maxLength: { value: 2000, message: 'Max 2,000 characters' } })}
-                className="textarea-field"
-                placeholder="Briefly describe what you organised, led, or participated in..."
-                rows={3}
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Q5 */}
-        <div>
-          <label className="label text-base">
-            5. What would you personally like to achieve by the end of the four-month program?{' '}
-            <span className="text-red-500">*</span>
-          </label>
+          <p className="text-slate-500 text-sm mb-3">
+            Describe one practical event or study circle idea you want to lead for students in your college (e.g. AI tools workshop, coding jam, open source sprint, or career prep circle).
+          </p>
           <textarea
             {...register('personalGoal', {
-              required: 'This answer is required',
-              minLength: { value: 50, message: 'Please write at least 50 characters' },
+              required: 'Please share an event or workshop idea',
+              minLength: { value: 30, message: 'Please write at least 30 characters' },
               maxLength: { value: 2000, message: 'Maximum 2,000 characters' },
             })}
             className={`textarea-field ${errors.personalGoal ? 'input-error' : ''}`}
-            placeholder="Think about what skills, experiences, or personal growth you hope to gain..."
+            placeholder="e.g. I want to host a hands-on 2-hour study jam on building AI apps with Gemini API, followed by a campus mini-hackathon..."
             rows={4}
           />
-          {errors.personalGoal && <p className="error-msg mt-1"><span>⚠</span>{errors.personalGoal.message}</p>}
+          <div className="flex justify-between mt-1.5 text-xs">
+            {errors.personalGoal ? (
+              <p className="error-msg"><span>⚠</span>{errors.personalGoal.message}</p>
+            ) : (
+              <span className="text-slate-400">Describe what topic, audience, and format you have in mind</span>
+            )}
+            <span className={goalText.length < 30 ? 'text-amber-600 font-medium' : 'text-slate-400'}>
+              {goalText.length}/2000
+            </span>
+          </div>
         </div>
       </div>
     </div>
   )
 }
-
-
