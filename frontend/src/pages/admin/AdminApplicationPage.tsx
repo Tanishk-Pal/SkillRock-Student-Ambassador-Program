@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom'
 import {
   ArrowLeft, Zap, LogOut, Loader2, AlertCircle, Save, Star, CheckCircle,
   XCircle, User, MessageSquare, Brain, MapPin, Zap as ZapIcon, Video,
-  ExternalLink, FileText,
+  ExternalLink, FileText, MessageCircle, Mail, Link2, Edit3,
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import api, { getUploadUrl } from '../../lib/api'
@@ -133,6 +133,12 @@ export default function AdminApplicationPage() {
   const [reviewerNotes, setReviewerNotes] = useState('')
   const [internalNotes, setInternalNotes] = useState('')
 
+  // Video state
+  const [customVideoUrl, setCustomVideoUrl] = useState('')
+  const [isEditingVideo, setIsEditingVideo] = useState(false)
+  const [videoLoadError, setVideoLoadError] = useState(false)
+  const [savingVideo, setSavingVideo] = useState(false)
+
   useEffect(() => {
     const fetchApplication = async () => {
       setLoading(true)
@@ -150,6 +156,8 @@ export default function AdminApplicationPage() {
         })
         setReviewerNotes(app.reviewerNotes ?? '')
         setInternalNotes(app.internalNotes ?? '')
+        setCustomVideoUrl(app.videoUrl || '')
+        setVideoLoadError(false)
       } catch {
         setError('Failed to load application.')
       } finally {
@@ -160,6 +168,28 @@ export default function AdminApplicationPage() {
   }, [id])
 
   const totalScore = Object.values(scores).reduce((a, b) => a + Number(b), 0)
+
+  const handleUpdateVideoUrl = async (newUrl: string) => {
+    if (!newUrl.trim()) {
+      toast.error('Please enter a video URL')
+      return
+    }
+    setSavingVideo(true)
+    try {
+      await api.patch(`/applications/${id}`, {
+        videoUrl: newUrl.trim(),
+        videoType: 'link',
+      })
+      toast.success('Video URL updated successfully!')
+      setApplication(prev => prev ? { ...prev, videoUrl: newUrl.trim(), videoType: 'link' } : prev)
+      setIsEditingVideo(false)
+      setVideoLoadError(false)
+    } catch {
+      toast.error('Failed to update video URL')
+    } finally {
+      setSavingVideo(false)
+    }
+  }
 
   const handleSave = async () => {
     setSaving(true)
@@ -324,90 +354,215 @@ export default function AdminApplicationPage() {
               </Section>
             )}
 
-            {/* Section 6 */}
+            {/* Section 6: Video Introduction */}
             <Section title="Video Introduction" icon={Video}>
-              {/* If Google Drive link is provided */}
+              {/* WhatsApp & Email Quick Action Bar */}
+              {(() => {
+                const cleanPhone = (application.phone || '').replace(/[^0-9]/g, '')
+                const waPhone = cleanPhone.length === 10 ? `91${cleanPhone}` : cleanPhone
+                const waText = encodeURIComponent(
+                  `Hi ${application.fullName}! This is SkillRock SSAP Review Team regarding your Student Ambassador application (${application.applicationId}). We are reviewing your submission! If your 60-second video introduction link is set to private/restricted or unavailable, please share your Google Drive video link with "Anyone with the link can view" access. Thank you!`
+                )
+                const mailSubject = encodeURIComponent(
+                  `SkillRock Student Ambassador Application: Video Introduction — ${application.applicationId}`
+                )
+                const mailBody = encodeURIComponent(
+                  `Hi ${application.fullName},\n\nWe are currently reviewing your SkillRock Student Ambassador application (${application.applicationId})!\n\nTo complete your video evaluation, please ensure your 60-second video introduction is accessible. If your Google Drive link was private or your video was not accessible, please reply with your updated Google Drive link (make sure General Access is set to "Anyone with the link can view").\n\nBest regards,\nSkillRock SSAP Review Board`
+                )
+
+                return (
+                  <div className="mb-5 p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="text-xs text-slate-600">
+                      <span className="font-bold text-slate-800">Candidate Contact: </span>
+                      {application.phone} · {application.email}
+                    </div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <a
+                        href={`https://wa.me/${waPhone}?text=${waText}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm transition-colors"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5" />
+                        Message on WhatsApp
+                      </a>
+                      <a
+                        href={`mailto:${application.email}?subject=${mailSubject}&body=${mailBody}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white shadow-sm transition-colors"
+                      >
+                        <Mail className="w-3.5 h-3.5" />
+                        Send Email
+                      </a>
+                    </div>
+                  </div>
+                )
+              })()}
+
+              {/* Case 1: Google Drive link provided */}
               {application.videoUrl && (
-                <div className="mb-4">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Google Drive Video:</span>
-                    <span className="text-xs font-semibold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">
-                      Google Drive
+                <div className="mb-6 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                      <Link2 className="w-3.5 h-3.5 text-blue-600" />
+                      Google Drive Video Link
                     </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingVideo(!isEditingVideo)}
+                      className="text-xs text-brand-violet hover:underline flex items-center gap-1 font-semibold"
+                    >
+                      <Edit3 className="w-3 h-3" />
+                      {isEditingVideo ? 'Cancel Edit' : 'Edit Link'}
+                    </button>
                   </div>
 
                   {getGoogleDriveEmbedUrl(application.videoUrl) ? (
-                    <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-200 mb-3 shadow-inner">
+                    <div className="relative aspect-video w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-200 shadow-inner">
                       <iframe
                         src={getGoogleDriveEmbedUrl(application.videoUrl)!}
                         className="w-full h-full border-0"
-                        allow="autoplay; fullscreen"
+                        allow="autoplay; fullscreen; encrypted-media"
+                        sandbox="allow-scripts allow-same-origin allow-popups allow-forms"
                         title="Applicant Video Introduction"
                       />
                     </div>
                   ) : null}
 
-                  <p className="text-xs text-slate-600 font-mono bg-slate-50 p-2.5 rounded-lg border border-slate-200 break-all mb-3">
-                    {application.videoUrl}
-                  </p>
-                  <a
-                    href={application.videoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-primary text-xs py-2 px-4 inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700"
-                  >
-                    Open in Google Drive <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              )}
-
-              {/* If Direct File Upload is provided */}
-              {application.videoFilePath && (
-                <div className="space-y-3 pt-2 border-t border-slate-100">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Uploaded Video File</span>
-                    <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-100">
-                      MP4 / WebM
-                    </span>
-                  </div>
-                  <div className="space-y-3">
-                    <video
-                      controls
-                      crossOrigin="anonymous"
-                      src={getUploadUrl(application.videoFilePath)}
-                      className="w-full max-h-[380px] rounded-xl bg-slate-900 border border-slate-200 shadow-sm"
-                      preload="metadata"
-                    >
-                      Your browser does not support HTML5 video playback.
-                    </video>
-                    <div className="flex flex-wrap gap-2">
+                  {/* Prominent Direct View & Access Helper */}
+                  <div className="p-4 bg-blue-50/70 border border-blue-200 rounded-xl space-y-3">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                      <div>
+                        <p className="text-xs font-bold text-blue-950">Direct Google Drive Access</p>
+                        <p className="text-[11px] text-blue-700">
+                          If preview displays "You need access", open directly to view or request permissions in 1 click:
+                        </p>
+                      </div>
                       <a
-                        href={getUploadUrl(application.videoFilePath)}
+                        href={application.videoUrl}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="btn-primary text-xs py-2 px-3 inline-flex items-center gap-1.5"
+                        className="btn-primary text-xs py-2 px-4 inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 shadow-sm shrink-0"
                       >
-                        Open Video in New Tab <ExternalLink className="w-3.5 h-3.5" />
-                      </a>
-                      <a
-                        href={getUploadUrl(application.videoFilePath)}
-                        download
-                        className="btn-secondary text-xs py-2 px-3 inline-flex items-center gap-1.5"
-                      >
-                        Download Video File
+                        Open in Google Drive <ExternalLink className="w-3.5 h-3.5" />
                       </a>
                     </div>
-                    <div className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-lg border border-slate-200">
-                      Direct storage link: <a href={getUploadUrl(application.videoFilePath)} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline break-all">{getUploadUrl(application.videoFilePath)}</a>
+
+                    <p className="text-[11px] text-slate-500 font-mono bg-white p-2 rounded border border-blue-100 break-all select-all">
+                      {application.videoUrl}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {/* Case 2: Uploaded video file */}
+              {application.videoFilePath && (
+                <div className="space-y-4 pt-3 border-t border-slate-100">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-600 uppercase tracking-wider flex items-center gap-1.5">
+                      <Video className="w-3.5 h-3.5 text-emerald-600" />
+                      Uploaded Video File
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingVideo(!isEditingVideo)}
+                      className="text-xs text-brand-violet hover:underline flex items-center gap-1 font-semibold"
+                    >
+                      <Edit3 className="w-3 h-3" />
+                      {isEditingVideo ? 'Cancel' : 'Replace with Drive Link'}
+                    </button>
+                  </div>
+
+                  {videoLoadError ? (
+                    <div className="p-5 bg-amber-50 border border-amber-200 rounded-xl space-y-3">
+                      <div className="flex items-start gap-3">
+                        <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+                        <div>
+                          <h4 className="text-sm font-bold text-amber-900">
+                            Uploaded Video File Unavailable on Server
+                          </h4>
+                          <p className="text-xs text-amber-700 mt-1 leading-relaxed">
+                            On Render's cloud free tier, uploaded files on local container storage expire when the server goes to sleep.
+                            Click above to ask the student on WhatsApp or Email for their Google Drive video link, then paste it here.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <video
+                        controls
+                        crossOrigin="anonymous"
+                        src={getUploadUrl(application.videoFilePath)}
+                        className="w-full max-h-[380px] rounded-xl bg-slate-900 border border-slate-200 shadow-sm"
+                        preload="metadata"
+                        onError={() => setVideoLoadError(true)}
+                      >
+                        Your browser does not support HTML5 video playback.
+                      </video>
+                      <div className="flex flex-wrap gap-2">
+                        <a
+                          href={getUploadUrl(application.videoFilePath)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn-primary text-xs py-2 px-3 inline-flex items-center gap-1.5"
+                        >
+                          Open Video in New Tab <ExternalLink className="w-3.5 h-3.5" />
+                        </a>
+                        <a
+                          href={getUploadUrl(application.videoFilePath)}
+                          download
+                          className="btn-secondary text-xs py-2 px-3 inline-flex items-center gap-1.5"
+                        >
+                          Download Video File
+                        </a>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Case 3: No video URL or video file */}
+              {!application.videoUrl && !application.videoFilePath && (
+                <div className="p-5 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+                  <div className="flex items-center gap-3">
+                    <FileText className="w-5 h-5 text-slate-400" />
+                    <div>
+                      <p className="text-slate-800 text-sm font-semibold">No video introduction attached yet.</p>
+                      <p className="text-slate-500 text-xs">You can request the video link from the candidate or attach one below.</p>
                     </div>
                   </div>
                 </div>
               )}
 
-              {!application.videoUrl && !application.videoFilePath && (
-                <div className="flex items-center gap-3 bg-slate-50 rounded-xl p-4 border border-slate-200">
-                  <FileText className="w-5 h-5 text-slate-400" />
-                  <p className="text-slate-600 text-sm">No video introduction link or file submitted for this application.</p>
+              {/* Inline Video Link Editor (Always available or toggled) */}
+              {(isEditingVideo || (!application.videoUrl && (videoLoadError || !application.videoFilePath))) && (
+                <div className="mt-4 p-4 bg-slate-50 border border-slate-200 rounded-xl animate-fade-in space-y-3">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                      Attach or Update Video URL
+                    </label>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <input
+                      type="url"
+                      value={customVideoUrl}
+                      onChange={(e) => setCustomVideoUrl(e.target.value)}
+                      placeholder="Paste Google Drive link (e.g. https://drive.google.com/file/d/...)"
+                      className="input-field text-xs font-mono flex-1 py-2"
+                    />
+                    <button
+                      type="button"
+                      disabled={savingVideo || !customVideoUrl.trim()}
+                      onClick={() => handleUpdateVideoUrl(customVideoUrl)}
+                      className="btn-primary text-xs py-2 px-4 whitespace-nowrap inline-flex items-center gap-1.5 disabled:opacity-50"
+                    >
+                      {savingVideo ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+                      Save Video URL
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-slate-500">
+                    Supports Google Drive preview links, direct video URLs, and YouTube links.
+                  </p>
                 </div>
               )}
             </Section>

@@ -142,23 +142,35 @@ export default function Step6Video() {
               <label className="label">
                 Google Drive Video URL <span className="text-red-500">*</span>
               </label>
-              <input
-                {...register('videoUrl', {
-                  validate: (val) => {
-                    if (videoType !== 'link') return true
-                    if (!val || !val.trim()) return 'Google Drive video link is required'
-                    if (/youtube\.com|youtu\.be/i.test(val)) {
-                      return 'YouTube links are not accepted. Please provide a Google Drive link or upload a video file directly.'
-                    }
-                    if (!/drive\.google\.com|docs\.google\.com/i.test(val)) {
-                      return 'Please provide a valid Google Drive link (e.g. https://drive.google.com/file/d/...)'
-                    }
-                    return true
-                  },
-                })}
-                className={`input-field font-mono text-xs ${errors.videoUrl || isYouTube ? 'input-error' : ''}`}
-                placeholder="https://drive.google.com/file/d/1aBcDeFgHiJkLmNoPqRsTuVwXyZ/view?usp=sharing"
-              />
+              <div className="flex gap-2">
+                <input
+                  {...register('videoUrl', {
+                    validate: (val) => {
+                      if (videoType !== 'link') return true
+                      if (!val || !val.trim()) return 'Google Drive video link is required'
+                      if (/youtube\.com|youtu\.be/i.test(val)) {
+                        return 'YouTube links are not accepted. Please provide a Google Drive link or upload a video file directly.'
+                      }
+                      if (!/drive\.google\.com|docs\.google\.com/i.test(val)) {
+                        return 'Please provide a valid Google Drive link (e.g. https://drive.google.com/file/d/...)'
+                      }
+                      return true
+                    },
+                  })}
+                  className={`input-field font-mono text-xs flex-1 ${errors.videoUrl || isYouTube ? 'input-error' : ''}`}
+                  placeholder="https://drive.google.com/file/d/1aBcDeFgHiJkLmNoPqRsTuVwXyZ/view?usp=sharing"
+                />
+                {videoUrlVal && !isYouTube && (
+                  <a
+                    href={videoUrlVal}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn-secondary text-xs px-3.5 py-2 inline-flex items-center gap-1 shrink-0"
+                  >
+                    Test Link <ExternalLink className="w-3.5 h-3.5" />
+                  </a>
+                )}
+              </div>
 
               {isYouTube && (
                 <div className="mt-2 p-3 bg-red-50 border border-red-200 rounded-xl flex items-start gap-2 text-red-700 text-xs font-semibold">
@@ -194,6 +206,13 @@ export default function Step6Video() {
         {/* Option B: Simple Video Upload (Max 30 MB) */}
         {videoType === 'upload' && (
           <div className="space-y-3 animate-fade-in">
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900 text-xs flex items-start gap-2">
+              <Info className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <span>
+                <strong>Important:</strong> Direct uploads are subject to cloud storage expirations. For permanent, fast review and full HD playback, we strongly recommend choosing <strong>Google Drive Video Link</strong> above.
+              </span>
+            </div>
+
             <div className="flex items-center justify-between">
               <label className="label">Upload Video File <span className="text-red-500">*</span></label>
               <span className="text-xs font-bold text-slate-500 bg-slate-100 px-2.5 py-0.5 rounded-full">

@@ -357,6 +357,9 @@ router.patch('/:id', requireAdmin, async (req: Request, res: Response) => {
       videoScore,
       reviewerNotes,
       internalNotes,
+      videoUrl,
+      videoType,
+      videoFilePath,
     } = req.body;
 
     const validStatuses = ['submitted', 'under_review', 'shortlisted', 'interview', 'selected', 'not_selected'];
@@ -374,6 +377,9 @@ router.patch('/:id', requireAdmin, async (req: Request, res: Response) => {
     if (videoScore !== undefined) updateData.videoScore = Number(videoScore);
     if (reviewerNotes !== undefined) updateData.reviewerNotes = reviewerNotes;
     if (internalNotes !== undefined) updateData.internalNotes = internalNotes;
+    if (videoUrl !== undefined) updateData.videoUrl = videoUrl;
+    if (videoType !== undefined) updateData.videoType = videoType;
+    if (videoFilePath !== undefined) updateData.videoFilePath = videoFilePath;
     if (req.admin?.email) updateData.reviewedBy = req.admin.email;
 
     const application = await Application.findOneAndUpdate(
